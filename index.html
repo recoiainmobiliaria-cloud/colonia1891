@@ -731,6 +731,46 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
 @keyframes pulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(2.4);opacity:0}}
 .pulse{width:22px;height:22px;border-radius:50%;background:var(--dot);animation:pulse 2s ease-out infinite}
 @media (prefers-reduced-motion: reduce){.pulse{animation:none;opacity:0}}
+/* Vista Cómo llegar */
+.rcard{position:fixed;z-index:1000;left:max(12px,calc(env(safe-area-inset-left,0px) + 12px));right:max(12px,calc(env(safe-area-inset-right,0px) + 12px));
+  bottom:calc(env(safe-area-inset-bottom,0px) + 14px);margin:0 auto;max-width:560px;padding:16px 18px 18px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.35);display:grid;gap:12px}
+.rcard .from{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.rcard .nums{display:flex;gap:22px;align-items:flex-end;flex-wrap:wrap}
+.rcard .num b{display:block;font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.rcard .num span{font-size:12.5px;color:var(--ink-2)}
+.rcard .alt{font-size:12.5px;color:var(--ink-2)}
+.go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;border:0;border-radius:16px;background:var(--sierra);color:#fff;font:700 16px var(--sans);cursor:pointer}
+.go svg{width:20px;height:20px}
+.pin{display:flex;align-items:center;gap:6px;transform:translate(-14px,-14px);white-space:nowrap}
+.pin i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--fortaleza);box-shadow:0 2px 8px rgba(0,0,0,.4);flex:none;border:2px solid #fff}
+.pin i svg{width:16px;height:16px}
+.pin b{font:700 12.5px var(--sans);color:#fff;background:rgba(0,33,50,.85);padding:4px 9px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.pin.main{transform:translate(-17px,-17px)}
+.pin.left{flex-direction:row-reverse;transform:translate(calc(-100% + 14px),-14px)}
+.pin.main i{background:var(--sierra);color:#fff;width:34px;height:34px;border-color:#fff}
+.pin.main b{background:var(--sierra)}
+.poi{display:flex;flex-direction:column;align-items:center;gap:4px;transform:translate(-50%,-19px);cursor:pointer;width:max-content}
+.poi i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--sierra);box-shadow:0 3px 10px rgba(0,0,0,.45);border:2px solid var(--sierra)}
+.poi i svg{width:20px;height:20px}
+.poi b{font:700 11.5px var(--sans);color:#fff;background:rgba(0,33,50,.85);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.hide-labels .poi b{display:none}
+/* Ficha de un lugar */
+.psheet{position:fixed;z-index:1100;left:max(12px,calc(env(safe-area-inset-left,0px) + 12px));right:max(12px,calc(env(safe-area-inset-right,0px) + 12px));
+  bottom:calc(env(safe-area-inset-bottom,0px) + 14px);margin:0 auto;max-width:560px;border-radius:22px;overflow:hidden;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(12px);box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.galw{position:relative}
+.gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.gal img{flex:0 0 100%;width:100%;aspect-ratio:16/9;object-fit:cover;scroll-snap-align:center;max-width:none;display:block;background:#0b1a22}
+.dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 3px rgba(0,0,0,.5)}
+.dots span.on{background:#fff}
+.pb{padding:14px 18px 16px;display:grid;gap:6px}
+.pb small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sierra);font-weight:700}
+.pb h3{margin:0;font-size:19px}
+.pb p{margin:0;font-size:14px;line-height:1.5;color:var(--ink-2);max-width:60ch}
+.pb .row{display:flex;gap:10px;margin-top:6px}
+.pb .row button{flex:1;min-height:46px;border-radius:14px;border:1px solid var(--glass-line);background:rgba(255,255,255,.08);color:var(--ink);font:600 14px var(--sans);cursor:pointer}
+.pb .row button.pri{background:var(--sierra);border-color:var(--sierra);color:#fff}
 @media (max-width:380px){.btn{width:50px;height:50px}.st .t{font-size:16px}}
 </style>
 
@@ -752,7 +792,24 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
 <button class="info" id="btnInfo" type="button" aria-expanded="false" aria-controls="note" title="Acerca del plano">i</button>
 <div class="note" id="note" hidden><b>Plano referencial.</b> Muestra la ubicación aproximada de los lotes según el plano de noviembre de 2026. Sirve para orientarse en el terreno; los linderos exactos los define el plano oficial.</div>
 
-<div class="card">
+<div class="rcard" id="rcard">
+  <div class="from">Desde la Plaza de Armas de Oxapampa</div>
+  <div class="nums">
+    <div class="num"><b id="rKm">15,4 km</b><span>por carretera</span></div>
+    <div class="num"><b>20–25 min</b><span>en auto</span></div>
+  </div>
+  <div class="alt">10,6 km en línea recta</div>
+  <button class="go" id="btnGo" type="button">Entrar al proyecto
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+</div>
+
+<div class="psheet" id="psheet" hidden role="dialog" aria-labelledby="pT">
+  <div class="galw"><div class="gal" id="gal"></div><div class="dots" id="dots"></div></div>
+  <div class="pb"><small>Imagen referencial</small><h3 id="pT"></h3><p id="pD"></p>
+    <div class="row"><button id="pZoom" type="button">Ver en el mapa</button><button class="pri" id="pClose" type="button">Cerrar</button></div></div>
+</div>
+
+<div class="card" id="card" hidden>
   <div class="mix"><span>Terreno real</span><input id="mix" type="range" min="0" max="100" value="100" aria-label="Mostrar el plano sobre el terreno real"><span>Plano</span></div>
   <div class="st" id="st" role="status" aria-live="polite">
     <div class="t"><i></i><span id="t1">Buscando tu ubicación…</span></div>
@@ -763,6 +820,8 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v3M12 20v3M1 12h3M20 12h3"/></svg><span>Yo</span></button>
     <button class="btn" id="btnAll" type="button" aria-label="Ver todo el terreno">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Terreno</span></button>
+    <button class="btn" id="btnRoute" type="button" aria-label="Ver cómo llegar desde Oxapampa">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg><span>Ruta</span></button>
   </div>
 </div>
 
@@ -774,6 +833,19 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
 //# sourceMappingURL=leaflet.js.map</script>
 <script>
 const BOUNDS=[[-10.528772513005771, -75.49696363676114],[-10.542281164605892, -75.48593977273931]];
+const ROUTE={"km": 15.3, "coords": [[-10.57466, -75.40442], [-10.57466, -75.40442], [-10.57465, -75.4044], [-10.57445, -75.40394], [-10.57405, -75.40297], [-10.5739, -75.40296], [-10.5734, -75.40406], [-10.57284, -75.40535], [-10.5724, -75.40642], [-10.57226, -75.40658], [-10.572, -75.40678], [-10.57161, -75.40703], [-10.57136, -75.40715], [-10.57064, -75.40741], [-10.57049, -75.40742], [-10.57016, -75.40742], [-10.56999, -75.40737], [-10.56959, -75.4073], [-10.56924, -75.40726], [-10.56887, -75.40735], [-10.56869, -75.40743], [-10.56831, -75.40761], [-10.5679, -75.40796], [-10.56701, -75.40888], [-10.56666, -75.40925], [-10.5663, -75.4096], [-10.56601, -75.4099], [-10.56558, -75.41023], [-10.5655, -75.4103], [-10.56544, -75.41034], [-10.56537, -75.41039], [-10.56451, -75.41086], [-10.56372, -75.41133], [-10.56208, -75.41244], [-10.56106, -75.4131], [-10.56088, -75.41318], [-10.56066, -75.41331], [-10.56042, -75.41362], [-10.56028, -75.41376], [-10.56016, -75.41379], [-10.56005, -75.4138], [-10.55991, -75.41381], [-10.55972, -75.41376], [-10.55915, -75.41364], [-10.5589, -75.41362], [-10.55866, -75.41365], [-10.55843, -75.41372], [-10.55824, -75.41386], [-10.55799, -75.41411], [-10.55769, -75.41441], [-10.55735, -75.41468], [-10.55723, -75.41477], [-10.557, -75.41502], [-10.55674, -75.41539], [-10.55642, -75.41581], [-10.55612, -75.41616], [-10.55554, -75.41689], [-10.55499, -75.4174], [-10.55473, -75.41769], [-10.55455, -75.41798], [-10.55449, -75.41809], [-10.55445, -75.41821], [-10.55439, -75.41854], [-10.55438, -75.41865], [-10.55429, -75.4188], [-10.55424, -75.41893], [-10.55425, -75.41927], [-10.55422, -75.41941], [-10.55413, -75.41953], [-10.55399, -75.41966], [-10.55389, -75.41978], [-10.55378, -75.41994], [-10.55367, -75.42003], [-10.55353, -75.42009], [-10.55338, -75.42015], [-10.55323, -75.4203], [-10.55295, -75.42072], [-10.55265, -75.42112], [-10.55227, -75.42158], [-10.55187, -75.42203], [-10.55161, -75.42236], [-10.55157, -75.42244], [-10.55156, -75.42253], [-10.55159, -75.42275], [-10.55158, -75.42297], [-10.55154, -75.42318], [-10.55156, -75.42339], [-10.55153, -75.42365], [-10.55143, -75.42384], [-10.55141, -75.42391], [-10.55141, -75.42397], [-10.55151, -75.42437], [-10.55153, -75.42441], [-10.55153, -75.42447], [-10.55151, -75.42457], [-10.55148, -75.42471], [-10.55131, -75.42496], [-10.55111, -75.42513], [-10.55095, -75.4253], [-10.55081, -75.42541], [-10.55058, -75.42548], [-10.55036, -75.42548], [-10.5503, -75.4255], [-10.55025, -75.42552], [-10.55018, -75.4256], [-10.55009, -75.42579], [-10.54999, -75.42596], [-10.54996, -75.42603], [-10.54992, -75.42608], [-10.54981, -75.42619], [-10.54964, -75.4263], [-10.54958, -75.42636], [-10.54945, -75.42649], [-10.54922, -75.42671], [-10.54898, -75.4269], [-10.5487, -75.42706], [-10.54845, -75.42716], [-10.54818, -75.42727], [-10.54812, -75.42729], [-10.54804, -75.42728], [-10.54745, -75.42703], [-10.54716, -75.42696], [-10.547, -75.42696], [-10.54685, -75.42698], [-10.54635, -75.42721], [-10.54607, -75.42725], [-10.54591, -75.4273], [-10.54578, -75.42739], [-10.54563, -75.42749], [-10.54535, -75.42758], [-10.54522, -75.42766], [-10.54502, -75.42785], [-10.54467, -75.42812], [-10.54445, -75.42833], [-10.54435, -75.42845], [-10.54431, -75.42856], [-10.5443, -75.42864], [-10.54434, -75.42886], [-10.54444, -75.42916], [-10.54449, -75.42935], [-10.54447, -75.42952], [-10.54444, -75.42964], [-10.54437, -75.42986], [-10.54429, -75.43003], [-10.54412, -75.4304], [-10.54387, -75.43091], [-10.54369, -75.43114], [-10.54336, -75.43146], [-10.54301, -75.43179], [-10.5425, -75.4322], [-10.54224, -75.43241], [-10.54202, -75.43255], [-10.5418, -75.43268], [-10.5416, -75.43292], [-10.5415, -75.43306], [-10.5413, -75.43324], [-10.54088, -75.43349], [-10.54003, -75.43425], [-10.5383, -75.43532], [-10.53577, -75.4367], [-10.5345, -75.43713], [-10.53185, -75.43661], [-10.52982, -75.43681], [-10.52878, -75.43728], [-10.52817, -75.43756], [-10.52792, -75.43765], [-10.52714, -75.43803], [-10.52709, -75.43805], [-10.52615, -75.43847], [-10.52569, -75.43868], [-10.52536, -75.43876], [-10.52516, -75.43881], [-10.52449, -75.43896], [-10.52431, -75.43899], [-10.52364, -75.43906], [-10.52256, -75.43924], [-10.52247, -75.43928], [-10.52239, -75.43934], [-10.52231, -75.43942], [-10.52206, -75.43968], [-10.52188, -75.43982], [-10.52165, -75.43993], [-10.52142, -75.44001], [-10.52118, -75.44006], [-10.52062, -75.44015], [-10.5203, -75.44018], [-10.51989, -75.44015], [-10.51881, -75.44], [-10.51861, -75.43998], [-10.51847, -75.44], [-10.5183, -75.44008], [-10.51622, -75.44209], [-10.51507, -75.44316], [-10.51488, -75.44333], [-10.51425, -75.44388], [-10.51365, -75.44448], [-10.51346, -75.44461], [-10.51323, -75.44471], [-10.51275, -75.4449], [-10.51193, -75.44533], [-10.51197, -75.44547], [-10.51203, -75.44586], [-10.51213, -75.44641], [-10.51216, -75.44671], [-10.51217, -75.44683], [-10.51232, -75.44744], [-10.51243, -75.44797], [-10.51243, -75.44804], [-10.5124, -75.44809], [-10.51229, -75.44817], [-10.51218, -75.44829], [-10.51214, -75.44838], [-10.51214, -75.44848], [-10.51217, -75.44857], [-10.51224, -75.44871], [-10.51274, -75.44946], [-10.51274, -75.44953], [-10.51273, -75.44958], [-10.51269, -75.4497], [-10.51266, -75.44992], [-10.51266, -75.45002], [-10.51268, -75.45012], [-10.5128, -75.45043], [-10.51292, -75.45062], [-10.51309, -75.45086], [-10.51324, -75.45104], [-10.51331, -75.45109], [-10.5134, -75.45121], [-10.51346, -75.45131], [-10.51352, -75.45146], [-10.51364, -75.45182], [-10.5138, -75.45227], [-10.51395, -75.45268], [-10.51413, -75.45312], [-10.51418, -75.45331], [-10.51422, -75.45355], [-10.51426, -75.45369], [-10.51431, -75.45411], [-10.51435, -75.45433], [-10.51439, -75.45442], [-10.51435, -75.45458], [-10.51433, -75.45475], [-10.51433, -75.45487], [-10.51434, -75.45491], [-10.51435, -75.455], [-10.51437, -75.45508], [-10.51444, -75.45531], [-10.51447, -75.45539], [-10.51452, -75.45559], [-10.51456, -75.45604], [-10.51457, -75.45634], [-10.51468, -75.45664], [-10.5161, -75.45794], [-10.51642, -75.45844], [-10.51648, -75.45868], [-10.5165, -75.4589], [-10.51632, -75.45924], [-10.51603, -75.45984], [-10.516, -75.45997], [-10.51607, -75.4601], [-10.51633, -75.46062], [-10.51637, -75.46102], [-10.51635, -75.46218], [-10.51641, -75.46313], [-10.51667, -75.46405], [-10.51684, -75.46437], [-10.51694, -75.46475], [-10.5172, -75.46524], [-10.5174, -75.46697], [-10.51736, -75.46707], [-10.51737, -75.46723], [-10.51746, -75.46734], [-10.51782, -75.46771], [-10.51802, -75.4682], [-10.51814, -75.46878], [-10.51825, -75.46914], [-10.51847, -75.46946], [-10.51874, -75.46984], [-10.51894, -75.47], [-10.51925, -75.47038], [-10.51948, -75.47058], [-10.51963, -75.47082], [-10.51969, -75.47096], [-10.51975, -75.47117], [-10.52012, -75.47177], [-10.52052, -75.47229], [-10.5209, -75.47258], [-10.52106, -75.47285], [-10.52115, -75.47331], [-10.52162, -75.47445], [-10.5217, -75.4748], [-10.52171, -75.47547], [-10.52157, -75.47608], [-10.52162, -75.47628], [-10.5219, -75.47652], [-10.52245, -75.47733], [-10.52247, -75.47774], [-10.52242, -75.47785], [-10.52225, -75.478], [-10.52215, -75.47822], [-10.5221, -75.47852], [-10.52219, -75.47883], [-10.52241, -75.47914], [-10.5228, -75.47934], [-10.52292, -75.47959], [-10.52308, -75.47979], [-10.52336, -75.4799], [-10.52399, -75.4806], [-10.52434, -75.48082], [-10.52472, -75.48126], [-10.52504, -75.48148], [-10.52529, -75.48155], [-10.52572, -75.48161], [-10.52602, -75.48168], [-10.52626, -75.48185], [-10.52723, -75.48253], [-10.52742, -75.4828], [-10.52757, -75.48339], [-10.52759, -75.4841], [-10.5276, -75.48424], [-10.52765, -75.48432], [-10.52816, -75.48468], [-10.52841, -75.48536], [-10.52842, -75.48552], [-10.52831, -75.4857], [-10.52825, -75.48587], [-10.52827, -75.48596], [-10.5284, -75.4862], [-10.52849, -75.48641], [-10.52861, -75.48654], [-10.52871, -75.4867], [-10.52873, -75.48687], [-10.52873, -75.48704], [-10.52863, -75.48735], [-10.52866, -75.48768], [-10.52892, -75.48808], [-10.52935, -75.48873], [-10.52935, -75.489], [-10.52941, -75.48928], [-10.52969, -75.48961], [-10.52982, -75.48975], [-10.53, -75.48992], [-10.53012, -75.48998], [-10.53024, -75.49006], [-10.53032, -75.49015], [-10.53034, -75.49038], [-10.53042, -75.49057], [-10.53052, -75.49071], [-10.53073, -75.49108], [-10.53099, -75.49151], [-10.53104, -75.49174], [-10.53111, -75.49187], [-10.53121, -75.49196], [-10.53142, -75.49206], [-10.53152, -75.49209], [-10.53173, -75.49216], [-10.53204, -75.49227], [-10.53208, -75.4923], [-10.53214, -75.49235], [-10.53223, -75.49241], [-10.53235, -75.49245]]};
+const PLAZA=[-10.5741915,-75.4046233];
+const ICONS={agua:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
+ club:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-6h4v6"/></svg>',
+ arbol:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-7M7 15h10l-5-11z"/></svg>',
+ libro:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v14c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v14"/></svg>',
+ pin:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>'};
+const POIS=[
+ {n:'Laguna central',ic:'agua',ll:[-10.531644,-75.491318],img:['09_laguna_existente.jpg','tarde_01_social_club_y_laguna_existente.jpg'],d:'Laguna de unos 6,000 m² que ya existe en el terreno, con cabañas construidas a su alrededor. Es el corazón de la primera etapa.'},
+ {n:'Social Club',ic:'club',ll:[-10.531099,-75.488673],img:['02_social_club.jpg','03_social_club_parque.jpg'],d:'Espacio de encuentro para las familias de la colonia, con áreas verdes alrededor.'},
+ {n:'Boulevard del riachuelo',ic:'arbol',ll:[-10.533713,-75.493255],img:['06_boulevard_aereo.jpg','07_boulevard_pergola.jpg'],d:'Paseo de casi 1 km que acompaña al riachuelo: zona de recreación para caminar y descansar.'},
+ {n:'Laguna 2',ic:'agua',ll:[-10.535432,-75.491256],img:['04_laguna_2_aerea.jpg','05_laguna_2_orilla.jpg'],d:'Laguna artificial de unas 2 hectáreas, proyectada para una etapa futura del proyecto.'},
+ {n:'Área educativa',ic:'libro',ll:[-10.537903,-75.490832],img:['08_area_educativa.jpg','tarde_04_area_educativa.jpg'],d:'Zona reservada dentro del proyecto para un área educativa.'}];
 const BLANK='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 const $=id=>document.getElementById(id);
 
@@ -784,12 +856,13 @@ setTimeout(hideSplash,matchMedia('(prefers-reduced-motion: reduce)').matches?150
 
 // Mapa (todo guardado dentro de la app: funciona sin internet)
 const B=L.latLngBounds(BOUNDS);
-const map=L.map('map',{zoomControl:false,attributionControl:false,minZoom:14,maxZoom:21,maxBounds:B.pad(1.2),zoomSnap:0.25});
-new L.TileLayer('tiles/sat/{z}/{x}/{y}.jpg',{minNativeZoom:15,maxNativeZoom:17,maxZoom:21,errorTileUrl:BLANK}).addTo(map);
+const RB=L.latLngBounds(ROUTE.coords).extend(PLAZA);
+const map=L.map('map',{zoomControl:false,attributionControl:false,minZoom:11,maxZoom:21,maxBounds:RB.pad(0.4),zoomSnap:0.25});
+new L.TileLayer('tiles/sat/{z}/{x}/{y}.jpg',{minNativeZoom:11,maxNativeZoom:17,maxZoom:21,errorTileUrl:BLANK}).addTo(map);
 const plan=new L.TileLayer('tiles/plan/{z}/{x}/{y}.webp',{minNativeZoom:15,maxNativeZoom:20,maxZoom:21,bounds:B,errorTileUrl:BLANK}).addTo(map);
 $('mix').addEventListener('input',e=>plan.setOpacity(e.target.value/100));
 L.control.scale({metric:true,imperial:false,position:'bottomleft'}).addTo(map);
-map.fitBounds(B,{paddingBottomRight:[0,150]});
+map.fitBounds(RB);
 
 // Tu ubicación
 const halo=L.marker(B.getCenter(),{icon:L.divIcon({className:'',html:'<div class="pulse"></div>',iconSize:[22,22]}),interactive:false,keyboard:false});
@@ -811,8 +884,8 @@ function update(lat,lon,a){
   if(ins){
     const q=a<=6?['ok','Precisión alta']:a<=12?['warn','Precisión media']:['bad','Precisión baja: espera unos segundos al aire libre'];
     status(q[0],'Estás aquí',q[1]+' · ±'+Math.round(a)+' m');
-    if(firstFix){firstFix=false;follow=true;setFollow(true);map.setView([lat,lon],19);}
-    else if(follow)map.panTo([lat,lon],{animate:true,duration:.4});
+    if(firstFix&&mode==='project'){firstFix=false;setFollow(true);map.setView([lat,lon],19);}
+    else if(follow&&mode==='project')map.panTo([lat,lon],{animate:true,duration:.4});
   }else{
     const c=B.getCenter(),d=dist(lat,lon,c.lat,c.lng);
     status('','Estás fuera del terreno','Colonia 1891 está a '+km(d)+' hacia el '+DIRS[Math.round(brg(lat,lon,c.lat,c.lng)/45)%8]);
@@ -825,12 +898,41 @@ if('geolocation' in navigator){
     {enableHighAccuracy:true,maximumAge:0,timeout:30000});}catch(e){status('bad','Ubicación no disponible','Este equipo no permite usar el GPS aquí');}
 }else status('bad','Ubicación no disponible','Este equipo no tiene GPS');
 
+// ---- Vista Cómo llegar ----
+const routeLayer=L.layerGroup([
+  L.polyline(ROUTE.coords,{color:'#fff',weight:8,opacity:.9,interactive:false}),
+  L.polyline(ROUTE.coords,{color:'#FF6600',weight:4.5,opacity:1,interactive:false}),
+  L.marker(PLAZA,{keyboard:false,icon:L.divIcon({className:'',iconSize:null,html:'<div class="pin left"><i>'+ICONS.pin+'</i><b>Plaza de Armas · Oxapampa</b></div>'})}),
+  L.marker(B.getCenter(),{title:'Entrar al proyecto',icon:L.divIcon({className:'',iconSize:null,html:'<div class="pin main"><i>'+ICONS.pin+'</i><b>Residencial Colonia 1891</b></div>'})}).on('click',()=>enterProject())
+]);
+// ---- Lugares del proyecto ----
+const poiLayer=L.layerGroup(POIS.map((p,i)=>L.marker(p.ll,{title:p.n,icon:L.divIcon({className:'',iconSize:null,html:'<div class="poi"><i>'+ICONS[p.ic]+'</i><b>'+p.n+'</b></div>'})}).on('click',()=>openPoi(i))));
+let mode='route';
+function showRoute(){mode='route';closePoi();$('card').hidden=true;$('rcard').hidden=false;map.removeLayer(poiLayer);routeLayer.addTo(map);setFollow(false);
+  map.flyToBounds(RB,{paddingTopLeft:[20,80],paddingBottomRight:[20,240],duration:1.2});}
+function enterProject(){mode='project';$('rcard').hidden=true;$('card').hidden=false;map.removeLayer(routeLayer);poiLayer.addTo(map);
+  if(pos&&inside(pos.lat,pos.lon)){setFollow(true);map.flyTo([pos.lat,pos.lon],19,{duration:1.8});}else map.flyToBounds(B,{paddingBottomRight:[0,150],duration:1.8});}
+map.on('zoomend',()=>document.body.classList.toggle('hide-labels',map.getZoom()<16.3));
+routeLayer.addTo(map);map.fitBounds(RB,{paddingTopLeft:[20,80],paddingBottomRight:[20,240]});
+$('btnGo').onclick=enterProject;
+// ---- Ficha de un lugar ----
+let cur=-1;
+function openPoi(i){cur=i;const p=POIS[i];$('pT').textContent=p.n;$('pD').textContent=p.d;
+  const g=$('gal');g.replaceChildren(...p.img.map(f=>{const im=new Image();im.src='img/'+f;im.alt=p.n+' (imagen referencial)';return im;}));g.scrollLeft=0;
+  $('dots').replaceChildren(...p.img.map((_,k)=>{const s=document.createElement('span');if(!k)s.className='on';return s;}));
+  $('card').hidden=true;$('psheet').hidden=false;}
+function closePoi(){$('psheet').hidden=true;if(mode==='project')$('card').hidden=false;}
+$('gal').addEventListener('scroll',()=>{const g=$('gal'),k=Math.round(g.scrollLeft/g.clientWidth);[...$('dots').children].forEach((s,j)=>s.classList.toggle('on',j===k));},{passive:true});
+$('pClose').onclick=closePoi;
+$('pZoom').onclick=()=>{const p=POIS[cur];closePoi();setFollow(false);map.flyTo(p.ll,18,{duration:1.2});};
+
 // Botones
 $('btnMe').onclick=()=>{
   if(!pos){status('warn','Buscando tu ubicación…','Activa la ubicación del celular');return;}
   if(!inside(pos.lat,pos.lon)){map.fitBounds(B,{paddingBottomRight:[0,150]});return;}
   setFollow(true);map.setView([pos.lat,pos.lon],Math.max(map.getZoom(),19));
 };
+$('btnRoute').onclick=showRoute;
 $('btnAll').onclick=()=>{setFollow(false);map.fitBounds(B,{paddingBottomRight:[0,150]});};
 map.on('dragstart',()=>setFollow(false));
 $('btnInfo').onclick=()=>{const n=$('note');n.hidden=!n.hidden;$('btnInfo').setAttribute('aria-expanded',!n.hidden);};

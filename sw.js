@@ -1,5 +1,5 @@
 // Guarda la app en la tablet para usarla sin internet
-const V='recoia-colonia-v4';
+const V='recoia-colonia-v5';
 const FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','tiles.json'];
 self.addEventListener('install',e=>{e.waitUntil((async()=>{const c=await caches.open(V);await c.addAll(FILES);
   const list=await (await fetch('tiles.json',{cache:'no-store'})).json();
