@@ -711,6 +711,10 @@ body{background:#1d2622;color:var(--ink);font-family:var(--sans);overflow:hidden
 .card{position:fixed;z-index:1000;left:max(12px,calc(env(safe-area-inset-left,0px) + 12px));right:max(12px,calc(env(safe-area-inset-right,0px) + 12px));
   bottom:calc(env(safe-area-inset-bottom,0px) + 14px);margin:0 auto;max-width:560px;
   display:flex;align-items:center;gap:14px;padding:14px 14px 14px 18px;border-radius:22px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.card{flex-wrap:wrap;row-gap:12px}
+.mix{flex-basis:100%;display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;color:var(--ink-2);padding-bottom:10px;border-bottom:1px solid var(--glass-line)}
+.mix span{white-space:nowrap}
+.mix input{flex:1;min-width:0;height:32px;accent-color:var(--sierra);cursor:pointer}
 .st{flex:1;min-width:0;display:grid;gap:3px}
 .st .t{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:650}
 .st .t i{width:11px;height:11px;border-radius:50%;background:var(--ink-2);flex:none;box-shadow:0 0 0 4px rgba(255,255,255,.08)}
@@ -722,7 +726,7 @@ body{background:#1d2622;color:var(--ink);font-family:var(--sans);overflow:hidden
 .btn.on{background:var(--sierra);border-color:var(--sierra)}
 .btn span{position:absolute;bottom:-18px;font-size:10.5px;color:var(--ink-2);white-space:nowrap}
 button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
-.leaflet-control-scale{margin-bottom:calc(env(safe-area-inset-bottom,0px) + 104px)!important;margin-left:max(12px,calc(env(safe-area-inset-left,0px) + 12px))!important}
+.leaflet-control-scale{margin-bottom:calc(env(safe-area-inset-bottom,0px) + 160px)!important;margin-left:max(12px,calc(env(safe-area-inset-left,0px) + 12px))!important}
 .leaflet-control-scale-line{background:var(--glass);color:var(--ink);border-color:var(--ink);font-size:11px}
 @keyframes pulse{0%{transform:scale(.6);opacity:.7}100%{transform:scale(2.4);opacity:0}}
 .pulse{width:22px;height:22px;border-radius:50%;background:var(--dot);animation:pulse 2s ease-out infinite}
@@ -749,6 +753,7 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
 <div class="note" id="note" hidden><b>Plano referencial.</b> Muestra la ubicación aproximada de los lotes según el plano de noviembre de 2026. Sirve para orientarse en el terreno; los linderos exactos los define el plano oficial.</div>
 
 <div class="card">
+  <div class="mix"><span>Terreno real</span><input id="mix" type="range" min="0" max="100" value="100" aria-label="Mostrar el plano sobre el terreno real"><span>Plano</span></div>
   <div class="st" id="st" role="status" aria-live="polite">
     <div class="t"><i></i><span id="t1">Buscando tu ubicación…</span></div>
     <div class="s" id="t2">Activa la ubicación del celular</div>
@@ -784,9 +789,10 @@ const B=L.latLngBounds(BOUNDS);
 const map=L.map('map',{zoomControl:false,attributionControl:false,minZoom:14,maxZoom:21,maxBounds:B.pad(1.2),zoomSnap:0.25});
 const Off=L.TileLayer.extend({getTileUrl(c){const t=this.options.src[c.z+'/'+c.x+'/'+c.y];return t?(t.startsWith('data:')?t:'data:image/jpeg;base64,'+t):BLANK;}});
 new Off('',{src:TS,minNativeZoom:15,maxNativeZoom:19,maxZoom:21}).addTo(map);
-new Off('',{src:TP,minNativeZoom:15,maxNativeZoom:19,maxZoom:21,bounds:B}).addTo(map);
+const plan=new Off('',{src:TP,minNativeZoom:15,maxNativeZoom:19,maxZoom:21,bounds:B}).addTo(map);
+$('mix').addEventListener('input',e=>plan.setOpacity(e.target.value/100));
 L.control.scale({metric:true,imperial:false,position:'bottomleft'}).addTo(map);
-map.fitBounds(B,{paddingBottomRight:[0,90]});
+map.fitBounds(B,{paddingBottomRight:[0,150]});
 
 // Tu ubicación
 const halo=L.marker(B.getCenter(),{icon:L.divIcon({className:'',html:'<div class="pulse"></div>',iconSize:[22,22]}),interactive:false,keyboard:false});
@@ -825,10 +831,10 @@ if('geolocation' in navigator){
 // Botones
 $('btnMe').onclick=()=>{
   if(!pos){status('warn','Buscando tu ubicación…','Activa la ubicación del celular');return;}
-  if(!inside(pos.lat,pos.lon)){map.fitBounds(B,{paddingBottomRight:[0,90]});return;}
+  if(!inside(pos.lat,pos.lon)){map.fitBounds(B,{paddingBottomRight:[0,150]});return;}
   setFollow(true);map.setView([pos.lat,pos.lon],Math.max(map.getZoom(),19));
 };
-$('btnAll').onclick=()=>{setFollow(false);map.fitBounds(B,{paddingBottomRight:[0,90]});};
+$('btnAll').onclick=()=>{setFollow(false);map.fitBounds(B,{paddingBottomRight:[0,150]});};
 map.on('dragstart',()=>setFollow(false));
 $('btnInfo').onclick=()=>{const n=$('note');n.hidden=!n.hidden;$('btnInfo').setAttribute('aria-expanded',!n.hidden);};
 // Pantalla encendida mientras se usa
