@@ -10,7 +10,7 @@ self.addEventListener('activate',e=>{e.waitUntil((async()=>{
   await self.clients.claim();
   if(old.length){const cs=await self.clients.matchAll({type:'window'});cs.forEach(c=>{try{c.navigate(c.url);}catch(err){}});}
 })());});
-async function precache(){const c=await caches.open(V);
+async function precache(){for(const k of await caches.keys())if(k!==V)await caches.delete(k);const c=await caches.open(V);
   const list=await (await fetch('tiles.json',{cache:'no-store'})).json();
   for(let i=0;i<list.length;i+=30){await Promise.all(list.slice(i,i+30).map(async u=>{if(!(await c.match(u)))await c.add(u).catch(()=>{});}));}}
 self.addEventListener('message',e=>{if(e.data==='precache')e.waitUntil(precache());});
