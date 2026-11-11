@@ -741,6 +741,10 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
 .rcard .alt{font-size:12.5px;color:var(--ink-2)}
 .go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:52px;border:0;border-radius:16px;background:var(--sierra);color:#fff;font:700 16px var(--sans);cursor:pointer}
 .go svg{width:20px;height:20px}
+.offl{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px 8px;margin:0 0 12px;padding:9px 12px;border-radius:12px;background:#fff4ec;color:#7a3300;font:600 13px/1.3 var(--sans)}
+.offl i{width:10px;height:10px;border-radius:50%;background:var(--sierra)}
+.offl .bar{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden}.offl .bar b{display:block;height:100%;width:0;background:var(--sierra);transition:width .3s}
+.offl.ok{background:#eaf6e4;color:#24561a}.offl.ok i{background:#69BB4D}.offl.ok .bar{display:none}
 .pin{display:flex;align-items:center;gap:6px;transform:translate(-14px,-14px);white-space:nowrap}
 .pin i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--fortaleza);box-shadow:0 2px 8px rgba(0,0,0,.4);flex:none;border:2px solid #fff}
 .pin i svg{width:16px;height:16px}
@@ -861,6 +865,7 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
     <div class="num"><b>20–25 min</b><span>en auto</span></div>
   </div>
   <div class="alt">10,6 km en línea recta</div>
+  <div class="offl" id="offl" hidden role="status"><i></i><span id="offlT">Revisando el plano guardado…</span><div class="bar"><b id="offlB"></b></div></div>
   <button class="go" id="btnGo" type="button">Entrar al proyecto
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
 </div>
@@ -926,8 +931,8 @@ setTimeout(hideSplash,matchMedia('(prefers-reduced-motion: reduce)').matches?150
 const B=L.latLngBounds(BOUNDS);
 const RB=L.latLngBounds(ROUTE.coords).extend(PLAZA);
 const map=L.map('map',{zoomControl:false,attributionControl:false,minZoom:11,maxZoom:21,maxBounds:RB.pad(0.4),zoomSnap:0.25});
-new L.TileLayer('tiles/sat/{z}/{x}/{y}.jpg',{minNativeZoom:11,maxNativeZoom:17,maxZoom:21,errorTileUrl:BLANK}).addTo(map);
-const plan=new L.TileLayer('tiles/plan/{z}/{x}/{y}.webp',{minNativeZoom:15,maxNativeZoom:20,maxZoom:21,bounds:B,errorTileUrl:BLANK}).addTo(map);
+new L.TileLayer('tiles/sat/{z}/{x}/{y}.jpg',{minNativeZoom:11,maxNativeZoom:17,maxZoom:21,keepBuffer:6,errorTileUrl:BLANK}).addTo(map);
+const plan=new L.TileLayer('tiles/plan/{z}/{x}/{y}.webp',{minNativeZoom:15,maxNativeZoom:20,maxZoom:21,bounds:B,keepBuffer:6,errorTileUrl:BLANK}).addTo(map);
 $('mix').addEventListener('input',e=>plan.setOpacity(e.target.value/100));
 L.control.scale({metric:true,imperial:false,position:'bottomleft'}).addTo(map);
 map.fitBounds(RB);
@@ -1161,6 +1166,16 @@ if('serviceWorker' in navigator&&location.protocol==='https:'&&window.top===wind
   navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update().catch(()=>{});}).catch(()=>{});
   // guardar el mapa completo en segundo plano (para usar sin internet)
   navigator.serviceWorker.ready.then(r=>{if(r.active)r.active.postMessage('precache');});
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+  navigator.serviceWorker.addEventListener('message',e=>{const d=e.data;if(!d||d.t!=='mapa')return;
+    const box=$('offl'),T=$('offlT');box.hidden=false;
+    if(d.sinRed){T.textContent='Sin internet: conéctate a wifi una vez para guardar el plano';return;}
+    const pc=d.total?Math.floor(100*d.ok/d.total):0;$('offlB').style.width=pc+'%';
+    if(d.total&&d.ok>=d.total){box.classList.add('ok');T.textContent='Plano guardado ✓ listo para usar sin internet';}
+    else if(d.fin){box.classList.remove('ok');T.textContent='Falta guardar parte del plano ('+pc+'%). Abre la app con wifi otra vez';}
+    else{box.classList.remove('ok');T.textContent='Guardando el plano para usar sin internet… '+pc+'% · no cierres la app';}
+  });
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')navigator.serviceWorker.ready.then(r=>{if(r.active)r.active.postMessage('precache');});});
   // revisar si hay versión nueva cada vez que se vuelve a la app
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')navigator.serviceWorker.getRegistration().then(r=>r&&r.update().catch(()=>{}));});
 }
