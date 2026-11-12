@@ -744,6 +744,8 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
 .offl{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:4px 8px;margin:0 0 12px;padding:9px 12px;border-radius:12px;background:#fff4ec;color:#7a3300;font:600 13px/1.3 var(--sans)}
 .offl i{width:10px;height:10px;border-radius:50%;background:var(--sierra)}
 .offl .bar{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden}.offl .bar b{display:block;height:100%;width:0;background:var(--sierra);transition:width .3s}
+.gpsl{display:flex;align-items:center;gap:8px;margin:2px 0 10px;font:600 13.5px/1.3 var(--sans);color:var(--ink-2)}
+.gpsl i{width:10px;height:10px;border-radius:50%;flex:none;background:var(--ink-2)}.gpsl.ok i{background:#2F8CFF;box-shadow:0 0 0 4px rgba(47,140,255,.25)}.gpsl.ok{color:var(--ink)}.gpsl.bad i{background:var(--bad)}.gpsl.warn i{background:var(--warn)}
 .offl.ok{background:#eaf6e4;color:#24561a}.offl.ok i{background:#69BB4D}.offl.ok .bar{display:none}
 .pin{display:flex;align-items:center;gap:6px;transform:translate(-14px,-14px);white-space:nowrap}
 .pin i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--fortaleza);box-shadow:0 2px 8px rgba(0,0,0,.4);flex:none;border:2px solid #fff}
@@ -865,6 +867,7 @@ button:focus-visible{outline:3px solid var(--sierra);outline-offset:3px}
     <div class="num"><b>20–25 min</b><span>en auto</span></div>
   </div>
   <div class="alt">10,6 km en línea recta</div>
+  <div class="gpsl" id="gpsl" role="status"><i></i><span id="gpslT">Buscando tu ubicación…</span></div>
   <div class="offl" id="offl" hidden role="status"><i></i><span id="offlT">Revisando el plano guardado…</span><div class="bar"><b id="offlB"></b></div></div>
   <button class="go" id="btnGo" type="button">Entrar al proyecto
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -945,13 +948,14 @@ const dot=L.circleMarker(B.getCenter(),{radius:9,color:'#fff',weight:3,fillColor
 map.createPane('cone').style.zIndex=390;map.getPane('cone').style.pointerEvents='none';
 const cone=L.marker(B.getCenter(),{pane:'cone',interactive:false,keyboard:false,icon:L.divIcon({className:'',iconSize:[130,130],
   html:'<div class="cone"><svg viewBox="0 0 130 130"><defs><radialGradient id="cg" cx="65" cy="65" r="62" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2F8CFF" stop-opacity=".85"/><stop offset="1" stop-color="#2F8CFF" stop-opacity="0"/></radialGradient></defs><path d="M65 65L33.5 11.6A62 62 0 0 1 96.5 11.6Z" fill="url(#cg)"/></svg></div>'})});
-let pos=null,shown=false,follow=true,firstFix=true;
+let pos=null,shown=false,follow=true,firstFix=true,firstRoute=true;
 const R=6371000,rad=Math.PI/180;
 function dist(a,b,c,d){const x=(c-a)*rad,y=(d-b)*rad;const h=Math.sin(x/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
 function brg(a,b,c,d){const y=Math.sin((d-b)*rad)*Math.cos(c*rad),x=Math.cos(a*rad)*Math.sin(c*rad)-Math.sin(a*rad)*Math.cos(c*rad)*Math.cos((d-b)*rad);return (Math.atan2(y,x)/rad+360)%360;}
 const DIRS=['norte','noreste','este','sureste','sur','suroeste','oeste','noroeste'];
 function km(m){return m<1000?Math.round(m)+' m':(m/1000).toFixed(1).replace('.',',')+' km';}
-function status(cls,a,b){$('st').className='st '+cls;$('t1').textContent=a;$('t2').textContent=b;}
+function status(cls,a,b){$('st').className='st '+cls;$('t1').textContent=a;$('t2').textContent=b;
+  const g=$('gpsl');if(g){g.className='gpsl '+(pos?'ok':cls);$('gpslT').textContent=pos?(a+' · '+b):(a+' — '+b);}}
 function inside(lat,lon){return PB.contains([lat,lon]);}
 function update(lat,lon,a){
   pos={lat,lon,a};
@@ -969,6 +973,8 @@ function update(lat,lon,a){
     const c=PB.getCenter(),d=dist(lat,lon,c.lat,c.lng);
     status('','Estás fuera del terreno','Colonia 1891 está a '+km(d)+' hacia el '+DIRS[Math.round(brg(lat,lon,c.lat,c.lng)/45)%8]);
   }
+  if(firstRoute&&mode==='route'&&RB.pad(0.3).contains([lat,lon])){firstRoute=false;const h=$('rcard').offsetHeight+30;
+    map.flyToBounds(L.latLngBounds(RB.getSouthWest(),RB.getNorthEast()).extend([lat,lon]),{paddingTopLeft:[20,80],paddingBottomRight:[20,h],duration:1});}
   afterUpdate();
 }
 // ---- Brújula: hacia dónde apunta la tablet y mapa que gira ----
@@ -1026,11 +1032,19 @@ addEventListener('resize',()=>{if(rot){const c=map.getCenter();sizeRot();map.inv
 function afterUpdate(){if(target)guide();if(selLot&&!$('lsheet').hidden)$('lD').textContent=distTxt(selLot);}
 function setFollow(v){follow=v;$('btnMe').classList.toggle('on',v);$('btnMe').setAttribute('aria-pressed',v);}
 if('geolocation' in navigator){
-  try{navigator.geolocation.watchPosition(p=>{const c=p.coords;
+  let wid=null,t0=Date.now(),lastErr='';
+  const espera=()=>{const s=Math.round((Date.now()-t0)/1000);return s<60?s+' s':Math.floor(s/60)+' min '+(s%60)+' s';};
+  const gps=()=>{try{if(wid!==null)navigator.geolocation.clearWatch(wid);
+    wid=navigator.geolocation.watchPosition(p=>{const c=p.coords;lastErr='';
       if(c.heading!=null&&!isNaN(c.heading)&&c.speed>0.8)onHead(c.heading,'gps');
       update(c.latitude,c.longitude,c.accuracy);},
-    e=>{if(!pos)status('bad',e.code===1?'Sin permiso de ubicación':'Buscando señal de GPS…',e.code===1?'Permite la ubicación para esta app en los ajustes':'Sal a un lugar abierto y espera unos segundos');},
-    {enableHighAccuracy:true,maximumAge:0,timeout:30000});}catch(e){status('bad','Ubicación no disponible','Este equipo no permite usar el GPS aquí');}
+    e=>{lastErr=e.code===1?'perm':'gps';
+      if(e.code===1){status('bad','Sin permiso de ubicación','Permite la ubicación para esta app en los ajustes');return;}
+      if(!pos)status('warn','Buscando señal de GPS… '+espera(),'Al aire libre puede tardar unos minutos la primera vez');
+      setTimeout(gps,3000);},
+    {enableHighAccuracy:true,maximumAge:0,timeout:60000});}catch(e){status('bad','Ubicación no disponible','Este equipo no permite usar el GPS aquí');}};
+  gps();
+  setInterval(()=>{if(!pos&&lastErr!=='perm')status('warn','Buscando señal de GPS… '+espera(),'Al aire libre puede tardar unos minutos la primera vez');},1000);
 }else status('bad','Ubicación no disponible','Este equipo no tiene GPS');
 
 // ---- Lotes del plano oficial (KMZ de Efraín, nov 2026) ----
