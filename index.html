@@ -1032,19 +1032,20 @@ addEventListener('resize',()=>{if(rot){const c=map.getCenter();sizeRot();map.inv
 function afterUpdate(){if(target)guide();if(selLot&&!$('lsheet').hidden)$('lD').textContent=distTxt(selLot);}
 function setFollow(v){follow=v;$('btnMe').classList.toggle('on',v);$('btnMe').setAttribute('aria-pressed',v);}
 if('geolocation' in navigator){
-  let wid=null,t0=Date.now(),lastErr='';
+  // Dos búsquedas a la vez: GPS (preciso) y ubicación aproximada (wifi/antenas, más rápida).
+  // Se usa la del GPS cuando hay; la aproximada solo si el GPS no ha respondido en los últimos 15 s.
+  const W={hi:null,lo:null};let t0=Date.now(),lastErr='',hiT=0;
   const espera=()=>{const s=Math.round((Date.now()-t0)/1000);return s<60?s+' s':Math.floor(s/60)+' min '+(s%60)+' s';};
-  const gps=()=>{try{if(wid!==null)navigator.geolocation.clearWatch(wid);
-    wid=navigator.geolocation.watchPosition(p=>{const c=p.coords;lastErr='';
+  const gps=k=>{try{if(W[k]!==null)navigator.geolocation.clearWatch(W[k]);
+    W[k]=navigator.geolocation.watchPosition(p=>{const c=p.coords;lastErr='';
+      if(k==='hi')hiT=Date.now();else if(Date.now()-hiT<15000)return;
       if(c.heading!=null&&!isNaN(c.heading)&&c.speed>0.8)onHead(c.heading,'gps');
       update(c.latitude,c.longitude,c.accuracy);},
-    e=>{lastErr=e.code===1?'perm':'gps';
-      if(e.code===1){status('bad','Sin permiso de ubicación','Permite la ubicación para esta app en los ajustes');return;}
-      if(!pos)status('warn','Buscando señal de GPS… '+espera(),'Al aire libre puede tardar unos minutos la primera vez');
-      setTimeout(gps,3000);},
-    {enableHighAccuracy:true,maximumAge:0,timeout:60000});}catch(e){status('bad','Ubicación no disponible','Este equipo no permite usar el GPS aquí');}};
-  gps();
-  setInterval(()=>{if(!pos&&lastErr!=='perm')status('warn','Buscando señal de GPS… '+espera(),'Al aire libre puede tardar unos minutos la primera vez');},1000);
+    e=>{if(e.code===1){lastErr='perm';status('bad','Sin permiso de ubicación','Permite la ubicación para esta app en los ajustes');return;}
+      lastErr='e'+e.code;setTimeout(()=>gps(k),3000);},
+    {enableHighAccuracy:k==='hi',maximumAge:k==='hi'?0:30000,timeout:60000});}catch(e){status('bad','Ubicación no disponible','Este equipo no permite usar el GPS aquí');}};
+  gps('hi');gps('lo');
+  setInterval(()=>{if(!pos&&lastErr!=='perm')status('warn','Buscando señal de GPS… '+espera(),'Al aire libre puede tardar unos minutos la primera vez'+(lastErr?' ('+lastErr+')':''));},1000);
 }else status('bad','Ubicación no disponible','Este equipo no tiene GPS');
 
 // ---- Lotes del plano oficial (KMZ de Efraín, nov 2026) ----
