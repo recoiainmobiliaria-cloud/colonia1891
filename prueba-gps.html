@@ -1,0 +1,31 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prueba de ubicación</title>
+<style>
+body{margin:0;background:#002132;color:#fff;font:16px/1.4 system-ui,Roboto,Arial,sans-serif;padding:16px}
+h1{font-size:20px;margin:0 0 12px}
+button{width:100%;min-height:56px;border:0;border-radius:14px;background:#FF6600;color:#fff;font:700 18px system-ui;margin:8px 0}
+.b{background:#fff;color:#002132;border-radius:12px;padding:12px;margin:10px 0;font-size:15px}
+.b b{display:block;font-size:13px;color:#456452;text-transform:uppercase;letter-spacing:.04em}
+.ok{color:#2e7d1f;font-weight:700}.mal{color:#c0392b;font-weight:700}
+</style></head><body>
+<h1>Prueba de ubicación · Recoia</h1>
+<p>Toca el botón y espera hasta 1 minuto. Luego toma una foto de esta pantalla.</p>
+<button id="go">Probar mi ubicación</button>
+<div class="b"><b>Permiso</b><span id="perm">—</span></div>
+<div class="b"><b>Ubicación aproximada (wifi)</b><span id="lo">—</span></div>
+<div class="b"><b>Ubicación GPS (precisa)</b><span id="hi">—</span></div>
+<div class="b"><b>Equipo</b><span id="eq" style="font-size:12px"></span></div>
+<script>
+const $=id=>document.getElementById(id);
+const ERR={1:'Sin permiso (1)',2:'El equipo no da ubicación (2)',3:'Se demoró demasiado (3)'};
+$('eq').textContent=navigator.userAgent+' · seguro:'+window.isSecureContext+' · en app:'+(document.referrer||'-')+' · modo:'+(matchMedia('(display-mode: standalone)').matches?'app':'navegador');
+async function perm(){try{const p=await navigator.permissions.query({name:'geolocation'});$('perm').textContent=p.state==='granted'?'Concedido':p.state==='denied'?'BLOQUEADO':'Sin decidir (preguntará)';$('perm').className=p.state==='granted'?'ok':p.state==='denied'?'mal':'';}catch(e){$('perm').textContent='No se puede leer ('+e.message+')';}}
+perm();
+function probar(id,hi){const el=$(id),t0=Date.now();el.textContent='Buscando…';el.className='';
+  if(!('geolocation' in navigator)){el.textContent='Este navegador no tiene ubicación';el.className='mal';return;}
+  navigator.geolocation.getCurrentPosition(p=>{const c=p.coords;el.textContent='OK en '+Math.round((Date.now()-t0)/1000)+' s · ±'+Math.round(c.accuracy)+' m · '+c.latitude.toFixed(4)+', '+c.longitude.toFixed(4);el.className='ok';perm();},
+    e=>{el.textContent=(ERR[e.code]||'Error '+e.code)+' en '+Math.round((Date.now()-t0)/1000)+' s · '+e.message;el.className='mal';perm();},
+    {enableHighAccuracy:hi,timeout:60000,maximumAge:hi?0:60000});}
+$('go').onclick=()=>{probar('lo',false);probar('hi',true);};
+</script></body></html>
